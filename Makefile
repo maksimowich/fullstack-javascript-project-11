@@ -1,11 +1,19 @@
+develop:
+	npx webpack serve
+
 install:
-	npm install
+	npm ci
+
+build:
+	NODE_ENV=production npx webpack
+
+test:
+	npm test
+
+test-coverage:
+	npm test -- --coverage --coverageProvider=v8
 
 lint:
 	npx eslint .
 
-build:
-	npm run-script build
-
-start:
-	npm run-script start-server
+.PHONY: test
