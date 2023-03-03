@@ -1,74 +1,47 @@
-const path = require('path');
-
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
+const autoprefixer = require('autoprefixer');
 
 module.exports = {
-  entry: {
-    main: './src/index.js',
-  },
+  entry: './src/scripts/index.js',
   output: {
+    filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-    clean: true,
   },
   mode: process.env.NODE_ENV || 'development',
+  devServer: {
+    stats: 'errors-only',
+  },
   module: {
     rules: [
       {
-        test: /\.(sc|c)ss$/,
+        test: /\.(scss|sass)$/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
           {
             loader: 'postcss-loader',
             options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    'postcss-preset-env',
-                    {
-                      stage: 3,
-                      features: {
-                        'nesting-rules': true,
-                      },
-                      browsers: 'last 5 versions',
-                    },
-                  ],
-                ],
-              },
+              plugins: () => [autoprefixer],
             },
           },
           'sass-loader',
         ],
       },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
-      },
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: 'index.html',
-    }),
     new MiniCssExtractPlugin({
       filename: 'style.css',
     }),
+    new HtmlWebpackPlugin({
+      template: 'template.html',
+    }),
+    new CopyWebpackPlugin([{
+      from: './src/images',
+      to: './images',
+    }]),
   ],
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    host: '0.0.0.0',
-    port: 8000,
-    open: true,
-    overlay: {
-      warnings: true,
-      errors: true,
-    },
-    clientLogLevel: 'error',
-  },
 };
