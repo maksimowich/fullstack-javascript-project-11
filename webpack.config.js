@@ -1,53 +1,21 @@
-const path = require('path');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
-module.exports = {
-  entry: {
-    main: './src/index.js',
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-    clean: true,
-  },
+export default {
   mode: process.env.NODE_ENV || 'development',
   module: {
     rules: [
+      { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
       {
-        test: /\.(sc|c)ss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    'postcss-preset-env',
-                    {
-                      stage: 3,
-                      features: {
-                        'nesting-rules': true,
-                      },
-                      browsers: 'last 5 versions',
-                    },
-                  ],
-                ],
-              },
-            },
-          },
-          'sass-loader',
-        ],
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader', 'postcss-loader'],
       },
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
+        test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        use: 'url-loader?limit=10000',
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
+        use: 'file-loader',
       },
     ],
   },
@@ -55,20 +23,5 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'index.html',
     }),
-    new MiniCssExtractPlugin({
-      filename: 'style.css',
-    }),
   ],
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    host: '0.0.0.0',
-    port: 8000,
-    open: true,
-    overlay: {
-      warnings: true,
-      errors: true,
-    },
-    clientLogLevel: 'error',
-  },
 };
